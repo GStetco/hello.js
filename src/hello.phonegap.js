@@ -17,7 +17,7 @@ if (window.cordova && window.cordova.platformId !== 'browser') {
 	hello.utils.popup = function(url, redirectUri, options) {
 
 		// Run the standard
-		const popup = utilPopup.call(this, url, redirectUri, options);
+		var popup = utilPopup.call(this, url, redirectUri, options);
 
 		// Create a function for reopening the popup, and assigning events to the new popup object
 		// PhoneGap support
@@ -28,14 +28,14 @@ if (window.cordova && window.cordova.platformId !== 'browser') {
 
 				// Get the origin of the redirect URI
 
-				const a = URL(redirectUri);
-				const redirectUriOrigin = a.origin || `${a.protocol}//{a.hostname}`;
+				var a = hello.utils.url(redirectUri);
+				var redirectUriOrigin = a.origin || (a.protocol + '//' + a.hostname);
 
 				// Listen to changes in the InAppBrowser window
 
-				popup.addEventListener('loadstart', e => {
+				popup.addEventListener('loadstart', function(e) {
 
-					const url = e.url;
+					var url = e.url;
 
 					// Is this the path, as given by the redirectUri?
 					// Check the new URL agains the redirectUriOrigin.
@@ -47,34 +47,32 @@ if (window.cordova && window.cordova.platformId !== 'browser') {
 					}
 
 					// Split appart the URL
-					const a = URL(url);
+					var a = hello.utils.url(url);
 
 					// We dont have window operations on the popup so lets create some
 					// The location can be augmented in to a location object like so...
 
-					const _popup = {
+					var _popup = {
 						location: {
 							// Change the location of the popup
-							assign(location) {
+							assign: function(location) {
 
 								// Unfourtunatly an app is may not change the location of a InAppBrowser window.
 								// So to shim this, just open a new one.
-								popup.executeScript({code: `${window.location.href} = "${location};"`});
+								popup.executeScript({code: 'window.location.href = "' + location + ';"'});
 							},
 
 							search: a.search,
 							hash: a.hash,
 							href: a.href
 						},
-						close() {
+						close: function() {
 							if (popup.close) {
 								popup.close();
 								try {
 									popup.closed = true;
 								}
-								catch (_e) {
-									// Continue
-								}
+								catch (_e) {}
 							}
 						}
 					};
@@ -89,9 +87,7 @@ if (window.cordova && window.cordova.platformId !== 'browser') {
 				});
 			}
 		}
-		catch (e) {
-			// Continue
-		}
+		catch (e) {}
 
 		return popup;
 	};
