@@ -2,7 +2,8 @@
 (function() {
 
 	// Is this a phonegap implementation?
-	if (!(/^file:\/{3}[^\/]/.test(window.location.href) && window.cordova)) {
+	// the check on the file was a false positive for iOS on WKWebView + localhost implementation
+	if (!window.cordova || window.cordova.platformId !== 'browser') {
 		// Cordova is not included.
 		return;
 	}
