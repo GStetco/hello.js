@@ -3,7 +3,7 @@ const URL = require('tricks/window/url');
 const hello = require('./hello');
 
 // Is this a phonegap implementation?
-if (/^file:\/{3}[^/]/.test(window.location.href) && window.cordova) {
+if (window.cordova && window.cordova.platformId !== 'browser') {
 
 	// Augment the hidden iframe method
 	hello.utils.iframe = function(url, redirectUri) {
